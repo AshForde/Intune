@@ -30,7 +30,7 @@ Function Get-AllUsers {
                 $propertyParams['Filter'] = "userType eq 'member'"
             }
 
-        $users = Get-MgBetaUser @propertyParams
+        $users = Get-MgUser @propertyParams
         $totalUsers = $users.Count
 
         # Initialize progress counter
