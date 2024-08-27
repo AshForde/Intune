@@ -31,8 +31,8 @@ param(
 
 # Application Variables
 $AppName = "Git"
-$AppVersion = "2.45.2"
-$Installer = "Git-2.45.2-64-bit.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
+$AppVersion = "2.46.0"
+$Installer = "Git-2.46.0-64-bit.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
 $InstallArguments = "/VERYSILENT /NORESTART /NOCANCEL" # Optional
 $UninstallArguments = "/SILENT" # Optional
 

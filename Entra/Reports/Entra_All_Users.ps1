@@ -160,7 +160,7 @@ if ($SaveFileResult -eq [System.Windows.Forms.DialogResult]::OK) {
 
    
     # Autosize columns if needed
-    foreach ($column in $worksheet.Dimension.Start.Column..$worksheet.Dimension.End.Column) {
+    foreach ($column in $worksheet.Dimension.Start.Column.$worksheet.Dimension.End.Column) {
         $worksheet.Column($column).AutoFit()
     }
     

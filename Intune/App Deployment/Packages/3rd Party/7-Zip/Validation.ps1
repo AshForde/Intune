@@ -1,6 +1,6 @@
 $Folder = "$($env:homedrive)\HUD"
 $validation = "$Folder\02_Validation"
-$version = "<APPVERSION>"
+$version = "24.07"
 $validationFile = "$validation\7-Zip.txt"
 $content = Get-Content -Path $validationFile
 

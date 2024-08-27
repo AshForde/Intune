@@ -86,10 +86,10 @@ Write-LogEntry -Value "Connecting to Microsoft Graph" -Severity 1
 
 try {
 	# Define Graph scopes
-	# $scopes = @("DeviceManagementManagedDevices.PrivilegedOperations.All","DeviceManagementManagedDevices.ReadWrite.All","DeviceManagementManagedDevices.Read.All")
+	$scopes = @("DeviceManagementManagedDevices.PrivilegedOperations.All","DeviceManagementManagedDevices.ReadWrite.All","DeviceManagementManagedDevices.Read.All")
 
 	# Connect to Graph 
-	Connect-MgGraph #-Scopes $scopes -NoWelcome
+	Connect-MgGraph -Scopes $scopes -NoWelcome
 
 	try {
 		# Gather Device Info bas on OSType and Ownership

@@ -67,7 +67,7 @@ if ($Mode -eq "Install") {
 		try {
 			# Run setup with custom arguments and create validation file
 			Write-LogEntry -Value "Starting $Mode of SAFEQ Cloud Client" -Severity 1
-			[string]$Arguments = "/S /GATEWAYADDRESS=aucklandcentralhub-hud.au.ysoft.cloud /ACCOUNTDOMAIN=aucklandcentralhub-hud.au.ysoft.cloud /AUTHTYPE=6 /REMEMBERLOGIN=true /PAPER=A4 /DESKTOPICONS=true /REMEMBERLOGIN=true"
+			[string]$Arguments = "/S /GATEWAYADDRESS=aucklandcentralhub-hud.au.ysoft.cloud /ACCOUNTDOMAIN=aucklandcentralhub-hud.au.ysoft.cloud /AUTHTYPE=6 /REMEMBERLOGIN=true /PAPER=A4 /DESKTOPICONS=true /REMEMBERLOGIN=true /ALLUSERS=2"
 			$Process = Start-Process $SetupFilePath -ArgumentList $Arguments -Wait -PassThru -ErrorAction Stop
 
 			# Post Install Actions

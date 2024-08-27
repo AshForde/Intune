@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    7-Zip File Manager
+    New Outlook for Windows
 
 .DESCRIPTION
-    Script to install 7-Zip File Manager
+    Script to install New Outlook for Windows
 
 .PARAMETER Mode
     Sets the mode of operation. Supported modes are Install or Uninstall
@@ -13,9 +13,9 @@
     powershell.exe -executionpolicy bypass -file .\appinstall.ps1 -Mode Uninstall
 
 .NOTES
-    - AUTHOR: Ashley Forde
-    - Version: <APPVERSION>
-    - Date: 11.06.2024
+    - AUTHOR: 
+    - Version: 
+    - Date: 
 #>
 # Region Parameters
 [CmdletBinding()]
@@ -30,11 +30,10 @@ param(
 . "$PSScriptRoot\functions.ps1"
 
 # Application Variables
-$AppName = "7-Zip"
-$AppVersion = "24.07"
-$Installer = "7z2407-x64.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
-$InstallArguments = "/S" # Optional
-$UninstallArguments = "/S" # Optional
+$AppName = "New Outlook for Windows"
+$AppVersion = "1.2024.725.400"
+$Installer = "setup.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
+$InstallArguments = "--quiet --start-" # Optional
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
@@ -103,7 +102,12 @@ switch ($Mode) {
             $AppToUninstall = Get-InstalledApps -App $AppName
 
             # Uninstall App
-            $uninstallProcess = Start-Process $AppToUninstall.UninstallString -ArgumentList $UninstallArguments -PassThru -Wait -ErrorAction stop
+            $replace = ' uninstall --installPath "C:\VS2022"'
+            $UninstallString = $AppToUninstall.UninstallString -replace [regex]::Escape($replace), ''
+            $uninstallProcess = Start-Process $UninstallString -ArgumentList "$($replace) --quiet" -PassThru -Wait -ErrorAction stop    
+
+            # Installer Clean Up
+            Start-Process "C:\Program Files (x86)\Microsoft Visual Studio\Installer\InstallCleanup.exe" -ArgumentList "-f" -PassThru -Wait -ErrorAction stop
 
             # Post Uninstall Actions
             if ($uninstallProcess.ExitCode -eq "0") {
@@ -112,7 +116,7 @@ switch ($Mode) {
                     Remove-Item -Path $AppValidationFile -Force -Confirm:$false
                     Write-LogEntry -Value "Validation file has been removed at $AppValidationFile" -Severity 1
 
-                    # Cleanup 
+                    # Cleanup                    
                     if (Test-Path "$SetupFolder") {
                         Remove-Item -Path "$SetupFolder" -Recurse -Force -ErrorAction Continue
                         Write-LogEntry -Value "Cleanup completed successfully" -Severity 1
