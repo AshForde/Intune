@@ -76,11 +76,11 @@ if ($Mode -eq "Install") {
 
 			# Install the defined modules
 			foreach ($module in $modules) {
-				if (-not (Get-Module -ListAvailable -Name $module.Name)) {
-					Install-Module -Name $module.Name -Scope AllUsers -Force -AllowClobber -Verbose
-					Write-LogEntry -Value "$($module.Name) module has been installed successfully." -Severity 1
+				if (-not (Get-Module -ListAvailable -Name $module)) {
+					Install-Module -Name $module -Scope AllUsers -Force -AllowClobber -Verbose
+					Write-LogEntry -Value "$($module) module has been installed successfully." -Severity 1
 				} else {
-					Write-LogEntry -Value "$($module.name) module is already installed." -Severity 1
+					Write-LogEntry -Value "$($module) module is already installed." -Severity 1
 				}
 			}
 
@@ -89,6 +89,7 @@ if ($Mode -eq "Install") {
 					# Create validation file if script completes without issue
 					New-Item -ItemType File -Path $AppValidationFile -Force -Value $AppVersion
 					Write-LogEntry -Value "Validation file has been created at $AppValidationFile" -Severity 1
+					exit
 				} else {
 					Write-LogEntry -Value "One or both of the modules are not available." -Severity 1
 				}

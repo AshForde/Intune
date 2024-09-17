@@ -66,7 +66,7 @@ $modules = @(
 	@{ Name = 'Microsoft.PowerApps.PowerShell' },
 	@{ Name = 'Microsoft365DSC' },
 	@{ Name = 'MicrosoftTeams' },
-	@{ Name = 'PNP.PowerShell'; Version = '1.12' },
+	@{ Name = 'PNP.PowerShell'}, #; Version = '1.12' },
 	@{ Name = 'PSWindowsUpdate' },
 	@{ Name = 'ReverseDSC' },
 	@{ Name = 'SharePointPNPPowerShellOnline' },

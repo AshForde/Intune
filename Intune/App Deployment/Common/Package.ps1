@@ -38,7 +38,7 @@ Write-Host "Press any key to continue after copying the files..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
 Write-host "Starting IntuneWinAppUtil.exe and compiling .intunewin file" -ForegroundColor Cyan
-IntuneWinAppUtil.exe -c "$folderName" -s "appinstall.ps1" -o "C:\HUD\20_Packages" -q 
+& C:\HUD\10_Software\Microsoft-Win32-Content-Prep-Tool-master\IntuneWinAppUtil.exe -c "$folderName" -s "appinstall.ps1" -o "C:\HUD\20_Packages" -q 
 
 Write-Host "Opening Explorer at package location" -ForegroundColor Cyan
 Invoke-Item -Path $FolderName
