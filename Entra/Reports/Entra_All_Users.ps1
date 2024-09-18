@@ -1,7 +1,14 @@
 # Connect to Microsoft Graph PowerShell
 Write-Host "Connecting to Microsoft Graph"
-$Scopes = @('AuditLog.Read.All','Directory.Read.All','Organization.Read.All','User.Read','User.Read.All',"UserAuthenticationMethod.Read.All")
-Connect-MgGraph -Scopes $Scopes -NoWelcome | out-null
+
+#$Scopes = @('AuditLog.Read.All','Directory.Read.All','Organization.Read.All','User.Read','User.Read.All',"UserAuthenticationMethod.Read.All")
+#Connect-MgGraph -Scopes $Scopes -NoWelcome | out-null
+
+#Auth via Certificate
+Connect-MgGraph `
+    -ClientId $env:DigitalSupportAppID `
+    -TenantId $env:DigitalSupportTenantID `
+    -CertificateThumbprint $env:DigitalSupportCertificateThumbprint -NoWelcome | Out-Null
 
 # Obtain Last Sign Date Time (Non Standard property value)
 Write-Host "Collecting user information..." -ForegroundColor yellow
@@ -30,7 +37,7 @@ Function Get-AllUsers {
                 $propertyParams['Filter'] = "userType eq 'member'"
             }
 
-        $users = Get-MgUser @propertyParams
+        $users = Get-MgBetaUser @propertyParams
         $totalUsers = $users.Count
 
         # Initialize progress counter
@@ -172,4 +179,6 @@ if ($SaveFileResult -eq [System.Windows.Forms.DialogResult]::OK) {
 } else {
 	Write-Host "Save cancelled" -ForegroundColor Yellow
 }
-Clear
+Disconnect-MgGraph | Out-Null
+
+Clear-Host
