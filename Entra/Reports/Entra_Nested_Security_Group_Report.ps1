@@ -21,11 +21,20 @@ This PowerShell script is designed to discover and report on nested group struct
 
 #>
 
-Connect-MgGraph -Scopes $Scopes -NoWelcome | Out-Null
-$UPN = (Get-MgContext).Account
+#Requires -Modules Microsoft.Graph.Authentication
+#Requires -Modules ExchangeOnlineManagement
+
+#Auth via Certificate
+Connect-MgGraph `
+    -ClientId $env:DigitalSupportAppID `
+    -TenantId $env:DigitalSupportTenantID `
+    -CertificateThumbprint $env:DigitalSupportCertificateThumbprint -NoWelcome | Out-Null
 
 # Connect to Exchange Online
-Connect-ExchangeOnline -UserPrincipalName $UPN -ShowBanner:$false
+Connect-ExchangeOnline `
+    -AppId $env:DigitalSupportAppID `
+    -Organization "mhud.onmicrosoft.com" `
+    -CertificateThumbprint $env:DigitalSupportCertificateThumbprint -ShowBanner:$false
 
 # Get all groups from Microsoft Graph
 $allGroups = Get-MgGroup -All | Where-Object { $_.DisplayName -notlike "PIM - *" }

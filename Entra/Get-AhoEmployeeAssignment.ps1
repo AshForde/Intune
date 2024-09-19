@@ -3,10 +3,15 @@ Write-Host '## Check users Aho Employee Attributes ##' -ForegroundColor Yellow
 
 # Connect to MgGraph and define scope for reviewing user account
 try {
-	Connect-MgGraph -Scopes "Directory.Read.All","Directory.ReadWrite.All","User.Read.All","User.ReadWrite.All" -NoWelcome | Out-Null
-} catch {
-	Write-Host "Error connecting to Microsoft Graph. Please check your credentials and network connection." -ForegroundColor Red
-	exit 1
+    #Auth via Certificate
+    Connect-MgGraph `
+        -ClientId $env:DigitalSupportAppID `
+        -TenantId $env:DigitalSupportTenantID `
+        -CertificateThumbprint $env:DigitalSupportCertificateThumbprint -NoWelcome | Out-Null
+        
+    } catch {
+	    Write-Host "Error connecting to Microsoft Graph. Please check your credentials and network connection." -ForegroundColor Red
+	    exit 1
 }
 
 do {
