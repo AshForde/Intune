@@ -112,6 +112,7 @@ Function Get-AllUsers {
 try {
     Write-Host "Connecting to Microsoft Graph..." -ForegroundColor Green 
     
+    #Requires -Modules Microsoft.Graph.Authentication
     Connect-MgGraph `
         -ClientId $env:DigitalSupportAppID `
         -TenantId $env:DigitalSupportTenantID `
@@ -126,7 +127,6 @@ try {
 }
 
 do {
-	# Employee Status
 	Write-Host ''
 	$Query = Read-Host "Do you want to include 'Guest' accounts? (y/n) - (or 'q' to quit)"
 
