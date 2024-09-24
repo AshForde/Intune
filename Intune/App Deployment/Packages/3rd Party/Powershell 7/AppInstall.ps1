@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Tableau Reader
+    Powershell 7.4.5
 
 .DESCRIPTION
-    Script to install Tableau Reader
+    Script to install Powershell 7.4.5
 
 .PARAMETER Mode
     Sets the mode of operation. Supported modes are Install or Uninstall
@@ -30,11 +30,11 @@ param(
 . "$PSScriptRoot\functions.ps1"
 
 # Application Variables
-$AppName = "Tableau Reader"
-$AppVersion = "24.2.931.0"
-$Installer = "TableauReader-64bit-2024-2-2.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
-$InstallArguments = "ACCEPTEULA=1 DESKTOPSHORTCUT=1 AUTOUPDATE=1 REMOVEINSTALLEDAPP=1 SILENTLYREGISTERUSER=true /quiet /norestart" # Optional
-#$UninstallArguments = "/uninstall /quiet" # Optional
+$AppName = "PowerShell 7-x64"
+$AppVersion = "7.4.5"
+$Installer = "PowerShell-7.4.5-win-x64.msi" # assumes the .exe or .msi installer is in the Files folder of the app package.
+$InstallArguments = "/qn ENABLE_MU=1" # Optional
+$UninstallArguments = "MsiExec.exe" # Optional
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
@@ -95,67 +95,6 @@ switch ($Mode) {
                 Write-LogEntry -Value "Error running installer. Errormessage: $($_.Exception.Message)" -Severity 3
                 return # Stop execution of the script after logging a critical error
             }
-
-            # Auto populate the registration keys
-            New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS -Scope Global | Out-Null
-
-            $currentUserSID = Get-CurrentUserSID
-            $baseRegistryPath = "HKU:\$currentUserSID\Software\Tableau\Registration"
-
-            # Define the new keys to be created  
-            $newKeys = @("Data", "License")  
-  
-            # Loop through each key and create it  
-            foreach ($key in $newKeys) {
-                $newKeyPath = Join-Path -Path $baseRegistryPath -ChildPath $key  
-                if (-not (Test-Path $newKeyPath)) {
-                    New-Item -Path $newKeyPath -Force
-                    } else {
-                        Write-Output "Registry key already exists: $newKeyPath"  
-                        }
-                }  
-
-            # Define the path for the License key  
-            $licenseKeyPath = Join-Path -Path $baseRegistryPath -ChildPath "License"  
-  
-            # Define the name and data for the new value under License key  
-            $licenseValueName = "a484699a"  
-            $licenseValueData = "10"  
-  
-            # Create the new REG_SZ value under the License key  
-            if (Test-Path $licenseKeyPath) {  
-                New-ItemProperty -Path $licenseKeyPath -Name $licenseValueName -Value $licenseValueData -PropertyType String -Force
-                } else {  
-                    Write-Output "License key path does not exist: $licenseKeyPath"  
-                    }  
-  
-            # Define the path for the Data key  
-            $dataKeyPath = Join-Path -Path $baseRegistryPath -ChildPath "Data"  
-  
-            # Define the name and data for the new values under Data key  
-            $dataValues = @{  
-                "company" = "MHUD"  
-                "company_employees" = "500"  
-                "country" = "NZ"  
-                "email" = "DigitalSupport@hud.govt.nz"  
-                "first_name" = "Digital"  
-                "last_name" = "TableauUser"  
-                "opt_in" = "false"  
-                "state" = "WGN"  
-                "registration_date" = "09/24/2024 12:09:59.153 AM"  
-            }  
-  
-            # Create the new REG_SZ values under the Data key  
-            if (Test-Path $dataKeyPath) {  
-                foreach ($name in $dataValues.Keys) {  
-                    New-ItemProperty -Path $dataKeyPath -Name $name -Value $dataValues[$name] -PropertyType String -Force
-                    }  
-                } else {  
-                    Write-Output "Data key path does not exist: $dataKeyPath"  
-                    }  
-            
-            Remove-PSDrive HKU
-
         } catch [System.Exception]{ Write-LogEntry -Value "Error preparing installation $FileName $($mode). Errormessage: $($_.Exception.Message)" -Severity 3 }
     }
 
@@ -164,8 +103,7 @@ switch ($Mode) {
             $AppToUninstall = Get-InstalledApps -App $AppName
 
             # Uninstall App
-            $uninstallcommand =  "cmd.exe"
-            $uninstallProcess = Start-Process $uninstallcommand -ArgumentList "/c $($AppToUninstall.quietUninstallString)" -NoNewWindow -PassThru -Wait -ErrorAction stop
+            $uninstallProcess = Start-Process -FilePath "cmd.exe" -ArgumentList "/c $($AppToUninstall.UninstallString) /qn" -PassThru -Wait -ErrorAction Stop
 
             # Post Uninstall Actions
             if ($uninstallProcess.ExitCode -eq "0") {
