@@ -32,8 +32,8 @@ param(
 
 # Application Variables
 $AppName = "WinSCP"
-$AppVersion = "2.0"
-$Installer = "WinSCP-6.3.3-Setup.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
+$AppVersion = "6.3.5"
+$Installer = "WinSCP-6.3.5-Setup.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
 $InstallArguments = "/VERYSILENT /ALLUSERS /ALLUSERS /NORESTART" # Optional
 $UninstallArguments = "/VERYSILENT /ALLUSERS /ALLUSERS /NORESTART" # Optional
 

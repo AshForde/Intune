@@ -1,7 +1,7 @@
 $Folder = "$($env:homedrive)\HUD"
 $validation = "$Folder\02_Validation"
-$version = "<APP VERSION>"
-$validationFile = "$validation\<APP NAME>.txt"
+$version = "6.3.5"
+$validationFile = "$validation\WinSCP.txt"
 $content = Get-Content -Path $validationFile
 
 if($content -eq $version){
