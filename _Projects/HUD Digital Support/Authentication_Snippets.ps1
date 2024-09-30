@@ -1,6 +1,7 @@
 # Requires -Modules Microsoft.Graph.Authentication
 # Requires -Modules ExchangeOnlineManagement
 # Requires -Modules PNP.Powershell
+# Requires -Modules MicrosoftTeams
 
 # Function to connect to Microsoft Graph
 function Connect-MicrosoftGraph {
@@ -30,4 +31,14 @@ function Connect-PnPPowerShell {
                       -Tenant 'mhud.onmicrosoft.com' `
                       -Thumbprint $env:DigitalSupportCertificateThumbprint
     Write-Host "Connected to PnP PowerShell."
+}
+
+# Function to connect to Microsoft Teams
+function Connect-Teams {
+    Write-Host "Connecting to Microsoft Teams..."
+    Connect-MicrosoftTeams `
+        -TenantId $env:DigitalSupportTenantID `
+        -CertificateThumbprint $env:DigitalSupportCertificateThumbprint `
+        ApplicationId $env:DigitalSupportAppID
+    Write-Host "Connected to Microsoft Teams."
 }
