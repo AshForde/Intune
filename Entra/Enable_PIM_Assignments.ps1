@@ -10,33 +10,24 @@
     powershell.exe -executionpolicy bypass -file .\Enable_PIM_Assignment.ps1
 
 .NOTES
-    - AUTHOR: Ashley Forde
+    - AUTHOR : Ashley Forde
     - Version: 2.0
-    - Date: 12 Oct 2023
-    - Notes:
-        - Previous version relied on AzureAD cmdlets. This script has been updated to solely rely on the PowerShell Graph SDK.
-
+    - Date   : 12 Oct 2023
+    - Notes  : 
 #>
 
-# Define Graph scopes
-$scopes = @("DeviceManagementApps.Read.All",
-	"DeviceManagementConfiguration.Read.All",
-	"DeviceManagementManagedDevices.Read.All",
-	"DeviceManagementServiceConfig.Read.All",
-	"Directory.Read.All",
-	"RoleManagement.Read.All",
-	"RoleManagement.ReadWrite.Directory",
-	"RoleManagementPolicy.Read.Directory",
-	"User.Read.All",
-	"User.ReadBasic.All",
-	"User.ReadWrite"
-)
+#Requires -Modules Microsoft.Graph.Identity.Governance
+
+$MaximumFunctionCount = 8192
+$MaximumVariableCount = 8192
+
+Clear-Host
 
 # Connect to Graph 
-Connect-MgGraph -Scopes $scopes -NoWelcome
+Connect-MgGraph -NoWelcome
 
 # Obtain current user EntraID ObjectID
-$context = Get-MgContext
+$context     = Get-MgContext
 $currentUser = (Get-MgUser -UserId $context.Account).id
 
 # Select which role group you wish to activate
@@ -76,7 +67,6 @@ $ToActivate = @(
 
 $SelectedRoles = $ToActivate | Out-GridView -Title "Select Role(s) to Activate" -PassThru
 
-
 # Provide justification to activate roles
 $Justification = Read-Host "Provide a justification"
 
@@ -91,7 +81,7 @@ if ([string]::IsNullOrWhiteSpace($UserChoice)) {
 #$Value = "User Administrator"
 foreach ($value in $SelectedRoles) {
 	# Get role displayName and ID
-	$Role = Get-MgDirectoryRoleTemplate | Where-Object { $value -contains $_.DisplayName } | Select-Object DisplayName,Id
+	$Role = Get-MgDirectoryRoleTemplate | Where-Object { $value -contains $_.DisplayName } | Select-Object DisplayName, Id
 
 	# Policy Assignment to role
 	$PolicyAssignment = Get-MgPolicyRoleManagementPolicyAssignment -Filter "scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$($Role.Id)'" #-ExpandProperty "policy(`$expand=rules)"
@@ -112,12 +102,12 @@ foreach ($value in $SelectedRoles) {
 
 		# Prompt the user to enter a duration, repeating until a valid duration is entered    
 		do {
-			$UserInput = Read-Host "Enter a duration for the assignment $($value) in hours (1-$MaxDurationHours)"
-			$output = 0
+			$UserInput    = Read-Host "Enter a duration for the assignment $($value) in hours (1-$MaxDurationHours)"
+			$output       = 0
 			$parseSuccess = [int]::TryParse($UserInput,[ref]$output)
 			if ($parseSuccess -and $output -gt 0 -and $output -le $MaxDurationHours) {
 				$SelectedDurationHours = $output
-				$FutureDate = (Get-Date).AddHours($output)
+				$FutureDate            = (Get-Date).AddHours($output)
 			} else {
 				Write-Host "Invalid input. Please enter a number between 1 and $MaxDurationHours."
 			}
@@ -125,7 +115,7 @@ foreach ($value in $SelectedRoles) {
 	} else {
 		# User chose 'No' or provided an invalid response, so use the max duration
 		$SelectedDurationHours = $MaxDurationHours
-		$FutureDate = (Get-Date).AddHours($MaxDurationHours)
+		$FutureDate            = (Get-Date).AddHours($MaxDurationHours)
 	}
 
 	# Convert the selected duration back to the format expected by the script 
@@ -142,15 +132,15 @@ foreach ($value in $SelectedRoles) {
 
 	# Setup parameters for activation
 	$params = @{
-		Action = "selfActivate"
-		PrincipalId = $myRole.PrincipalId
+		Action           = "selfActivate"
+		PrincipalId      = $myRole.PrincipalId
 		RoleDefinitionid = $myRole.RoleDefinitionid
 		DirectoryScopeId = $myRole.DirectoryScopeId
-		Justification = "$Justification"
-		ScheduleInfo = @{
+		Justification    = "$Justification"
+		ScheduleInfo     = @{
 			StartDateTime = Get-Date
-			Expiration = @{
-				Type = "AfterDuration"
+			Expiration    = @{
+				Type     = "AfterDuration"
 				Duration = "$SelectedDuration"
 			}
 		}
@@ -166,12 +156,12 @@ foreach ($value in $SelectedRoles) {
 		$Result = @()
 
 		$Result += [pscustomobject]@{
-			Role = $value
+			Role                                   = $value
 			UnifiedRoleAssignmentScheduleRequestId = $Activation.id
-			Justification = $Activation.Justification
-			Status = $Activation.Status
-			EntraRoleID = $Activation.RoleDefinitionid
-			Expires = $FormattedFutureDate
+			Justification                          = $Activation.Justification
+			Status                                 = $Activation.Status
+			EntraRoleID                            = $Activation.RoleDefinitionid
+			Expires                                = $FormattedFutureDate
 		}
 		$Result
 
