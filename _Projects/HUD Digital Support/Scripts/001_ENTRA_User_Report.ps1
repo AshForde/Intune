@@ -16,7 +16,6 @@ try {
     $CollectToken = Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/users" -ContentType "txt" -OutputType HttpResponseMessage
     $Token        = $CollectToken.RequestMessage.Headers.Authorization.Parameter
 
-        
     } catch {
         Write-Host "Error connecting to Microsoft Graph. Please check your credentials and network connection." -ForegroundColor Red
         exit 1
@@ -126,21 +125,18 @@ do {
     }
 } while ($uri)
 
-# Output the user details
-#$output
-
 Write-Host "Open Save Dialog"
 
 # Basic metrics
-$totalUsers = $output.Count
-$enabledUsers = $output | Where-Object { $_.'Account Enabled' -eq $true } | Measure-Object | Select-Object -ExpandProperty Count
+$totalUsers    = $output.Count
+$enabledUsers  = $output | Where-Object { $_.'Account Enabled' -eq $true } | Measure-Object | Select-Object -ExpandProperty Count
 $disabledUsers = $totalUsers - $enabledUsers
 
 Write-Host "Total Users: $totalUsers"
 Write-Host "Enabled Users: $enabledUsers"
 Write-Host "Disabled Users: $disabledUsers"
 
-$Date = Get-Date -Format "dd.MM.yyyy h.mm tt"
+$Date     = Get-Date -Format "dd.MM.yyyy h.mm tt"
 $FileName = "Entra All Users Export"
 
 # Add assembly and import namespace  
@@ -190,3 +186,4 @@ if ($SaveFileResult -eq [System.Windows.Forms.DialogResult]::OK) {
 } else {
 Write-Host "Save cancelled" -ForegroundColor Yellow
 }
+Disconnect-MgGraph | Out-Null
