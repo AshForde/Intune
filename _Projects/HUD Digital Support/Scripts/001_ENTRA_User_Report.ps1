@@ -14,7 +14,7 @@ try {
     Write-Host "Connected" -ForegroundColor Green
 
     $CollectToken = Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/users" -ContentType "txt" -OutputType HttpResponseMessage
-    $Token = $CollectToken.RequestMessage.Headers.Authorization.Parameter
+    $Token        = $CollectToken.RequestMessage.Headers.Authorization.Parameter
 
         
     } catch {
@@ -61,7 +61,7 @@ $select = @(
 ) -join ','
 
 # Graph API Call
-$uri = "https://graph.microsoft.com/v1.0/users?`$select=$select&`$expand=manager"
+$uri     = "https://graph.microsoft.com/v1.0/users?`$select=$select&`$expand=manager"
 $headers = @{
         "Authorization" = $Token
         "Content-Type"  = "application/json"
@@ -77,37 +77,37 @@ do {
     foreach ($user in $req.value) {
         $output += [PSCustomObject]@{
             # Identity
-            'ID'                                     = $user.id
-            'FirstName'                              = $user.givenName
-            'LastName'                               = $user.surname
-            'Display Name'                           = $user.displayName
-            'User Principal Name'                    = $user.userPrincipalName
-            'Email'                                  = $user.mail
-            'User Type'                              = $user.userType
-            'Account Enabled'                        = $user.accountEnabled
+            'ID'                  = $user.id
+            'FirstName'           = $user.givenName
+            'LastName'            = $user.surname
+            'Display Name'        = $user.displayName
+            'User Principal Name' = $user.userPrincipalName
+            'Email'               = $user.mail
+            'User Type'           = $user.userType
+            'Account Enabled'     = $user.accountEnabled
 
             # Organisational Structure
-            'Job Title'                              = $user.jobTitle
-            'Department'                             = $user.department
-            'Organisational Group'                   = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup
-            'Organisation'                           = $user.company
-            'Employee Type'                          = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType
-            'Employee Category'                      = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory
-            'Manager Display Name'                   = $user.manager.displayName
-            'Manager UPN'                            = $user.manager.userPrincipalName
-            'Manager Job Title'                      = $user.manager.jobTitle
+            'Job Title'            = $user.jobTitle
+            'Department'           = $user.department
+            'Organisational Group' = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup
+            'Organisation'         = $user.company
+            'Employee Type'        = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType
+            'Employee Category'    = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory
+            'Manager Display Name' = $user.manager.displayName
+            'Manager UPN'          = $user.manager.userPrincipalName
+            'Manager Job Title'    = $user.manager.jobTitle
 
             # Contact and Location
-            'Office'                                 = $user.OfficeLocation
-            'Address'                                = $user.streetAddress
-            'City'                                   = $user.City
-            'Postal Code'                            = $user.postalCode
-            'State'                                  = $user.state
-            'Country'                                = $user.country
-            'Phone'                                  = $user.businessPhones -join ',' 
-            'Mobile'                                 = $user.mobilePhone 
-             
-             # Account
+            'Office'      = $user.OfficeLocation
+            'Address'     = $user.streetAddress
+            'City'        = $user.City
+            'Postal Code' = $user.postalCode
+            'State'       = $user.state
+            'Country'     = $user.country
+            'Phone'       = $user.businessPhones -join ','
+            'Mobile'      = $user.mobilePhone
+
+            # Account
             'Created Date Time'                      = $user.createdDateTime
             'Last Interactive Sign In Date Time'     = $user.signInActivity.lastSignInDateTime
             'Last Non-Interactive Sign In Date Time' = $user.signInActivity.lastNonInteractiveSignInDateTime
@@ -118,10 +118,10 @@ do {
             'E5 License'                             = if ($user.assignedLicenses.skuid -eq "06ebc4ee-1bb5-47dd-8120-11324bc54e06") { $true } else { $false }
             'No Licenses'                            = if ($user.assignedLicenses.count -eq 0) { $true } else { $false }
                         
-             # Other
-            'Security Identifier'                    = $user.SecurityIdentifier
-            'Room Mailbox'                           = $User.extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox
-            'Shared Mailbox'                         = $User.extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox
+            # Other
+            'Security Identifier' = $user.SecurityIdentifier
+            'Room Mailbox'        = $User.extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox
+            'Shared Mailbox'      = $User.extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox
         }
     }
 } while ($uri)
@@ -131,7 +131,16 @@ do {
 
 Write-Host "Open Save Dialog"
 
-$Date     = Get-Date -Format "dd.MM.yyyy h.mm tt"
+# Basic metrics
+$totalUsers = $output.Count
+$enabledUsers = $output | Where-Object { $_.'Account Enabled' -eq $true } | Measure-Object | Select-Object -ExpandProperty Count
+$disabledUsers = $totalUsers - $enabledUsers
+
+Write-Host "Total Users: $totalUsers"
+Write-Host "Enabled Users: $enabledUsers"
+Write-Host "Disabled Users: $disabledUsers"
+
+$Date = Get-Date -Format "dd.MM.yyyy h.mm tt"
 $FileName = "Entra All Users Export"
 
 # Add assembly and import namespace  
@@ -148,7 +157,7 @@ $SaveFileDialog.FileName = $FileName
 $SaveFileResult = $SaveFileDialog.ShowDialog()
 
 if ($SaveFileResult -eq [System.Windows.Forms.DialogResult]::OK) {
-				$SelectedFilePath = $SaveFileDialog.FileName
+    $SelectedFilePath = $SaveFileDialog.FileName
     $output | Export-Excel $SelectedFilePath -AutoSize -AutoFilter -WorksheetName $Date -FreezeTopRow -BoldTopRow
     
     $excelPackage = Open-ExcelPackage -Path $SelectedFilePath
