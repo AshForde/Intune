@@ -17,7 +17,6 @@ try {
     $CollectToken = Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/users" -ContentType "txt" -OutputType HttpResponseMessage
     $Token        = $CollectToken.RequestMessage.Headers.Authorization.Parameter
     $Token | Out-Null
-
     } catch {
         Write-Host "Error connecting to Microsoft Graph. Please check your credentials and network connection." -ForegroundColor Red
         exit 1
@@ -32,7 +31,6 @@ try{
         -CertificateThumbprint $env:DigitalSupportCertificateThumbprint `
         -ShowBanner:$false
     Write-Host "Connected to Exchange Online." -ForegroundColor Green
-    
     } catch {
         Write-Host "Error connecting to Exchange Online. Please check your credentials and network connection." -ForegroundColor Red
         exit 1
@@ -52,7 +50,6 @@ if ($PSVersionTable.PSVersion -gt [Version]"7.0") {
             -Tenant 'mhud.onmicrosoft.com' `
             -Thumbprint $env:DigitalSupportCertificateThumbprint
         Write-Host "Connected to PnP PowerShell."  -ForegroundColor Green
-        
     } catch {
         Write-Host "Error connecting to PNP SharePoint Online. Please check your credentials and network connection." -ForegroundColor Red
         exit 1
@@ -69,7 +66,6 @@ try {
         -CertificateThumbprint $env:DigitalSupportCertificateThumbprint `
         -ApplicationId $env:DigitalSupportAppID | Out-Null
     Write-Host "Connected to Microsoft Teams." -ForegroundColor Green
-    
     } catch {
         Write-Host "Error connecting to Microsoft Teams. Please check your credentials and network connection." -ForegroundColor Red
         exit 1
