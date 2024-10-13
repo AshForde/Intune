@@ -10,6 +10,7 @@ $AdminSiteURL = "https://mhud-admin.sharepoint.com"
 #Requires -Modules PNP.Powershell
 # Connect to PnP PowerShell
 try {
+    $env:PNPPOWERSHELL_UPDATECHECK = "Off"
     Connect-PnPOnline -Url $AdminSiteURL `
         -ClientId $env:DigitalSupportAppID `
         -Tenant 'mhud.onmicrosoft.com' `
@@ -81,7 +82,11 @@ Connect-PnPOnline `
     -Thumbprint $env:DigitalSupportCertificateThumbprint
 
 # Retrieve and select the list
-$rootUrl = "https://mhud.sharepoint.com"
+if ($SelectedSite.Url -like "*-my.sharepoint.com*") {
+    $rootUrl = "https://mhud-my.sharepoint.com"
+} else {
+    $rootUrl = "https://mhud.sharepoint.com"
+}
 $Lists = Get-PnPList
 $SelectedList = $Lists | Out-GridView -Title "Select a List" -PassThru
 $ListName = $SelectedList.Title

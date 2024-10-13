@@ -76,51 +76,51 @@ do {
     foreach ($user in $req.value) {
         $output += [PSCustomObject]@{
             # Identity
-            'ID'                  = $user.id
-            'FirstName'           = $user.givenName
-            'LastName'            = $user.surname
-            'Display Name'        = $user.displayName
-            'User Principal Name' = $user.userPrincipalName
-            'Email'               = $user.mail
-            'User Type'           = $user.userType
-            'Account Enabled'     = $user.accountEnabled
+            'id'                          = $user.id
+            'first_name'                  = $user.givenName
+            'last_name'                   = $user.surname
+            'display_name'                = $user.displayName
+            'user_principal_name'         = $user.userPrincipalName
+            'email'                       = $user.mail
+            'user_type'                   = $user.userType
+            'account_enabled'             = $user.accountEnabled
 
             # Organisational Structure
-            'Job Title'            = $user.jobTitle
-            'Department'           = $user.department
-            'Organisational Group' = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup
-            'Organisation'         = $user.company
-            'Employee Type'        = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType
-            'Employee Category'    = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory
-            'Manager Display Name' = $user.manager.displayName
-            'Manager UPN'          = $user.manager.userPrincipalName
-            'Manager Job Title'    = $user.manager.jobTitle
+            'job_title'                   = $user.jobTitle
+            'department'                  = $user.department
+            'organisational_group'        = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup
+            'organisation'                = $user.company
+            'employee_type'               = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType
+            'employee_category'           = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory
+            'manager_display_name'        = $user.manager.displayName
+            'manager_upn'                 = $user.manager.userPrincipalName
+            'manager_job_title'           = $user.manager.jobTitle
 
             # Contact and Location
-            'Office'      = $user.OfficeLocation
-            'Address'     = $user.streetAddress
-            'City'        = $user.City
-            'Postal Code' = $user.postalCode
-            'State'       = $user.state
-            'Country'     = $user.country
-            'Phone'       = $user.businessPhones -join ','
-            'Mobile'      = $user.mobilePhone
+            'office'                      = $user.OfficeLocation
+            'address'                     = $user.streetAddress
+            'city'                        = $user.City
+            'postal_code'                 = $user.postalCode
+            'state'                       = $user.state
+            'country'                     = $user.country
+            'phone'                       = $user.businessPhones -join ','
+            'mobile'                      = $user.mobilePhone
 
             # Account
-            'Created Date Time'                      = $user.createdDateTime
-            'Last Interactive Sign In Date Time'     = $user.signInActivity.lastSignInDateTime
-            'Last Non-Interactive Sign In Date Time' = $user.signInActivity.lastNonInteractiveSignInDateTime
-            'Usage Location'                         = $user.usageLocation
-            'Password Policies'                      = $user.passwordPolicies
-            'Start Date'                             = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserStartDate
-            'Leave Date'                             = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserLeaveDateTime
-            'E5 License'                             = if ($user.assignedLicenses.skuid -eq "06ebc4ee-1bb5-47dd-8120-11324bc54e06") { $true } else { $false }
-            'No Licenses'                            = if ($user.assignedLicenses.count -eq 0) { $true } else { $false }
+            'created_date_time'                      = $user.createdDateTime
+            'last_interactive_sign_in_date_time'     = $user.signInActivity.lastSignInDateTime
+            'last_non_interactive_sign_in_date_time' = $user.signInActivity.lastNonInteractiveSignInDateTime
+            'usage_location'                         = $user.usageLocation
+            'password_policies'                      = $user.passwordPolicies
+            'start_date'                             = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserStartDate
+            'leave_date'                             = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserLeaveDateTime
+            'e5_license'                             = if ($user.assignedLicenses.skuid -eq "06ebc4ee-1bb5-47dd-8120-11324bc54e06") { $true } else { $false }
+            'no_licenses'                            = if ($user.assignedLicenses.count -eq 0) { $true } else { $false }
                         
             # Other
-            'Security Identifier' = $user.SecurityIdentifier
-            'Room Mailbox'        = $User.extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox
-            'Shared Mailbox'      = $User.extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox
+            'security_identifier'         = $user.SecurityIdentifier
+            'room_mailbox'                = $User.extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox
+            'shared_mailbox'              = $User.extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox
         }
     }
 } while ($uri)
