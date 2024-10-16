@@ -18,7 +18,7 @@ $SitesURL =@(
             "https://mhud.sharepoint.com/sites/arcmr",
             "https://mhud.sharepoint.com/sites/arcms",
             "https://mhud.sharepoint.com/sites/arcmu",
-            
+            "https://mhud.sharepoint.com/sites/arctr"
             )
 
 

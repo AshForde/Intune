@@ -1,6 +1,3 @@
-# Connect to the Microsoft 365 Compliance Center
-Connect-IPPSSession
-
 # Initialize a list to store the report
 $Report = [System.Collections.Generic.List[Object]]::new()
 

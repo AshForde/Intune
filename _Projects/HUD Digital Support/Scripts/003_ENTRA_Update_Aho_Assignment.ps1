@@ -14,8 +14,8 @@ try {
     Write-Host "Connected" -ForegroundColor Green
         
     } catch {
-	    Write-Host "Error connecting to Microsoft Graph. Please check your credentials and network connection." -ForegroundColor Red
-	    exit 1
+		Write-Host "Error connecting to Microsoft Graph. Please check your credentials and network connection." -ForegroundColor Red
+		exit 1
 }
 
 do {
@@ -25,7 +25,7 @@ do {
 
 	if ($UserPrincipalName -eq 'q') {
 		break
-	    }
+	}
 
 	# Return User details including Aho additional properties
 	Write-Host ''
@@ -66,25 +66,25 @@ do {
 						$attributes = @{
 							'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType' = $updateEmpType
 							'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory' = $updateEmpCategory
-						    }
+						}
 
-                        Update-MgBetaUser -UserId $UserPrincipalName -AdditionalProperties $attributes
-                        Write-Host "User: $UserPrincipalName`nEmployee Type: $updateEmpType`nEmployee Category: $updateEmpCategory" -ForegroundColor Green
-					    }
-				    }
+						Update-MgBetaUser -UserId $UserPrincipalName -AdditionalProperties $attributes
+						Write-Host "User: $UserPrincipalName`nEmployee Type: $updateEmpType`nEmployee Category: $updateEmpCategory" -ForegroundColor Green
+					}
+				}
 				'OG' {
 					$updateOrgGroup = Read-Host 'Enter a new organisational group to update (or press Enter to keep current value):'
 					if ($updateOrgGroup -ne '') {
 						$attributes = @{
 							'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup' = $updateOrgGroup
-						    }
+						}
 
 						Update-MgBetaUser -UserId $UserPrincipalName -AdditionalProperties $attributes
 						Write-Host "User: $UserPrincipalName`nOrganisational Group: $updateOrgGroup" -ForegroundColor Green
-					    }
-				    }
-			    }
-		    }
+					}
+				}
+			}
+		}
         } catch [Microsoft.Graph.ServiceException]{
             if ($_.Message -like "*Code: Request_ResourceNotFound*") {
                 Write-Host "User '$UserPrincipalName' not found. Please check if the User Principal Name is correct and try again." -ForegroundColor Red
