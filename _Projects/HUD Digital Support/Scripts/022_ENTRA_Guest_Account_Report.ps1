@@ -1,5 +1,5 @@
 Clear-Host
-Write-Host '## EntraID User Account Export ##' -ForegroundColor Yellow
+Write-Host '## EntraID Guest Account Export ##' -ForegroundColor Yellow
 
 # Requirements
 #Requires -Modules Microsoft.Graph.Authentication
@@ -33,34 +33,21 @@ $select = @(
     'accountEnabled'
     'jobTitle'
     'department'
-    'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup'
     'companyName'
-    'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType'
-    'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory'
-    'manager'
-    'OfficeLocation'
-    'streetAddress'
     'City'
-    'postalCode'
-    'state'
     'country'
-    'businessPhones'
     'mobilePhone'
+    'ExternalUserState'
+    'ExternalUserStateChangeDateTime'
+    'CreationType'
     'createdDateTime'
     'signInActivity'
-    'signInActivity'
     'usageLocation'
-    'passwordPolicies'
-    'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserStartDate'
-    'extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserLeaveDateTime'
-    'assignedLicenses'
-    'SecurityIdentifier'
-    'extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox'
-    'extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox'
+
 ) -join ','
 
 # Graph API Call
-$uri     = "https://graph.microsoft.com/v1.0/users?`$Filter=UserType eq 'Member'&`$select=$select&`$expand=manager"
+$uri     = "https://graph.microsoft.com/v1.0/users?`$Filter=UserType eq 'Guest'&`$select=$select&`$expand=manager"
 $headers = @{
         "Authorization" = $Token
         "Content-Type"  = "application/json"
@@ -74,62 +61,49 @@ do {
     $uri = $req.'@odata.nextLink'
 
     foreach ($user in $req.value) {
+    
         $TimeZone = "New Zealand Standard Time"
         
         $createdDateTime                 = $user.createdDateTime
         $successfulSignIn                = $user.signInActivity.lastSuccessfulSignInDateTime
+        $ExternalUserStateChangeDateTime = $user.ExternalUserStateChangeDateTime
+
 
         $NZSTcreatedDateTime                 = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($createdDateTime, [System.TimeZoneInfo]::Local.Id, $TimeZone)
         $NZSTsuccessfulSignIn                = if ($successfulSignIn) { [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($successfulSignIn, [System.TimeZoneInfo]::Local.Id, $TimeZone) } else { $null }
+        $NZSTExternalUserStateChangeDateTime = if ($NZSTExternalUserStateChangeDateTime) { [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($ExternalUserStateChangeDateTime, [System.TimeZoneInfo]::Local.Id, $TimeZone) } else { $null }
         $TimeSpan                            = if ($successfulSignIn) { New-TimeSpan -Start $NZSTsuccessfulSignIn -End (Get-Date) | Select-Object -ExpandProperty Days } else { $null }
-
+        
         $output += [PSCustomObject]@{
             # Identity
-            'id'                          = $user.id
-            'first_name'                  = $user.givenName
-            'last_name'                   = $user.surname
-            'display_name'                = $user.displayName
-            'user_principal_name'         = $user.userPrincipalName
-            'email'                       = $user.mail
-            'user_type'                   = $user.userType
-            'account_enabled'             = $user.accountEnabled
+            'id'                  = $user.id
+            'first_name'          = $user.givenName
+            'last_name'           = $user.surname
+            'display_name'        = $user.displayName
+            'user_principal_name' = $user.userPrincipalName
+            'email'               = $user.mail
+            'user_type'           = $user.userType
+            'account_enabled'     = $user.accountEnabled
 
             # Organisational Structure
-            'job_title'                   = $user.jobTitle
-            'department'                  = $user.department
-            'organisational_group'        = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserOrganisationalGroup
-            'organisation'                = $user.companyName
-            'employee_type'               = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmployeeType
-            'employee_category'           = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserEmploymentCategory
-            'manager_display_name'        = $user.manager.displayName
-            'manager_upn'                 = $user.manager.userPrincipalName
-            'manager_job_title'           = $user.manager.jobTitle
+            'job_title'    = $user.jobTitle
+            'department'   = $user.department
+            'organisation' = $user.companyName
 
             # Contact and Location
-            'office'                      = $user.OfficeLocation
-            'address'                     = $user.streetAddress
-            'city'                        = $user.City
-            'postal_code'                 = $user.postalCode
-            'state'                       = $user.state
-            'country'                     = $user.country
-            'phone'                       = $user.businessPhones -join ','
-            'mobile'                      = $user.mobilePhone
+            'city'    = $user.City
+            'country' = $user.country
+            'mobile'  = $user.mobilePhone
 
             # Account
-            'created_date_time'                      = $NZSTcreatedDateTime
+            'usage_location'                        = $user.usageLocation
+            'created_date_time'                     = $NZSTcreatedDateTime
+            'ExternalUserState'                     = $user.ExternalUserState
+            'ExternalUserStateChangeDateTime'       = if ($NZSTExternalUserStateChangeDateTime) {$NZSTExternalUserStateChangeDateTime} else { $null }
+            'CreationType'                          = $user.CreationType
             'last_successful_sign_in_date_time_nzt' = $NZSTsuccessfulSignIn
             'days_since_last_sign_in'               = $TimeSpan
-            'usage_location'                         = $user.usageLocation
-            'password_policies'                      = $user.passwordPolicies
-            'start_date'                             = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserStartDate
-            'leave_date'                             = $user.extension_56a473fa1d5b476484f306f7b06ee688_ObjectUserLeaveDateTime
-            'e5_license'                             = if ($user.assignedLicenses.skuid -eq "06ebc4ee-1bb5-47dd-8120-11324bc54e06") { $true } else { $false }
-            'no_licenses'                            = if ($user.assignedLicenses.count -eq 0) { $true } else { $false }
-                        
-            # Other
-            'security_identifier'         = $user.SecurityIdentifier
-            'room_mailbox'                = $User.extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox
-            'shared_mailbox'              = $User.extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox
+
         }
     }
 } while ($uri)
@@ -146,7 +120,7 @@ Write-Host "Enabled Users: $enabledUsers"
 Write-Host "Disabled Users: $disabledUsers"
 
 $Date     = Get-Date -Format "dd.MM.yyyy h.mm tt"
-$FileName = "Entra All Users Export"
+$FileName = "Entra Guest Account Export"
 
 # Add assembly and import namespace  
 Add-Type -AssemblyName System.Windows.Forms
