@@ -1,7 +1,7 @@
 $Folder = "$($env:homedrive)\HUD"
 $validation = "$Folder\02_Validation"
-$version = "<APP VERSION>"
-$validationFile = "$validation\<APP NAME>.txt"
+$version = "2025.1.0.117"
+$validationFile = "$validation\Printix Client.txt"
 $content = Get-Content -Path $validationFile
 
 if($content -eq $version){

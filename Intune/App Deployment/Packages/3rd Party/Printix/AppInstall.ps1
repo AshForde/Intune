@@ -31,7 +31,7 @@ param(
 
 # Application Variables
 $AppName = "Printix Client"
-$AppVersion = "2.2.1.73"
+$AppVersion = "2025.1.0.117"
 $Installer = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
 $InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms /qn" # Optional
 $UninstallArguments = "/SILENT" # Optional
