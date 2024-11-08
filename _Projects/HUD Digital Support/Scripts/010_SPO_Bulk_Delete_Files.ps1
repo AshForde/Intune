@@ -3,7 +3,7 @@ param (
 )
 
 Clear-Host
-Write-host "## SharePoint Online: Move Folders Between Sites/Libraries ##" -ForegroundColor Yellow
+Write-host "## SharePoint Online: Bulk Remove Files or Folders ##" -ForegroundColor Yellow
 
 $AdminSiteURL = "https://mhud-admin.sharepoint.com"
 
