@@ -15,10 +15,11 @@
 
 .NOTES
     - AUTHOR: Ashley Forde
-    - Version: 3.0
-    - Date: 18.04.2024
+    - Version: 3.1
+    - Date: 11.11.24
     - NOTES: 
-        - Refactored script to use functions.ps1
+        - Replaced PowerPoint template at request of Comms
+
 
 #>
 
@@ -69,7 +70,7 @@ $validationFolderVar = $folderPaths.ValidationFolder
 $Date = Get-Date -Format "MM-dd-yyyy"
 $AppName = "HUD - Office 365 Document Templates"
 $AppValidationFile = "$validationFolderVar\$AppName.txt"
-$AppVersion = "3.0"
+$AppVersion = "3.1"
 $LogFileName = "$($AppName)_${Mode}_$Date.log"
 
 # Begin Setup
