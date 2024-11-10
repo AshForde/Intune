@@ -57,7 +57,7 @@ function Remove-HudTemplates {
         "C:\HUD\02_Validation\HUD - Document Templates.txt"
         )
 
-    Remove-Item -Path $paths -Recurse -Force -Confirm:$false -ErrorAction Stop
+    Remove-Item -Path $paths -Recurse -Force -Confirm:$false -ErrorAction Continue
 }
 
 # Initialize Directories
