@@ -31,10 +31,9 @@ param(
 
 # Application Variables
 $AppName = "Printix Client"
-$AppVersion = "2025.1.0.117"
+$AppVersion = "2025.1.0.126"
 $Installer = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
 $InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms /qn" # Optional
-$UninstallArguments = "/SILENT" # Optional
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
@@ -120,7 +119,7 @@ switch ($Mode) {
                         # Remove left over driver install files
                         $AppToUninstall = Get-InstalledApps -App $AppName | Select-Object -First 1
                         $uninstall_command = 'MsiExec.exe'
-                        $Result = (($AppToUninstall.UninstallString -split ' ')[1]) + ' /VERYSILENT'
+                        $Result = (($AppToUninstall.UninstallString -split ' ')[1]) + ' /SILENT'
                         $uninstall_args = [string]$Result
                         $uninstallProcess = Start-Process $uninstall_command -ArgumentList $uninstall_args -PassThru -Wait -ErrorAction Stop
 

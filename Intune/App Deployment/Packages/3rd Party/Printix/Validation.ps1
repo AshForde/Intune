@@ -1,6 +1,6 @@
 $Folder = "$($env:homedrive)\HUD"
 $validation = "$Folder\02_Validation"
-$version = "2025.1.0.117"
+$version = "2025.1.0.126"
 $validationFile = "$validation\Printix Client.txt"
 $content = Get-Content -Path $validationFile
 
