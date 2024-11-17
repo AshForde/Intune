@@ -33,7 +33,8 @@ param(
 $AppName = "Printix Client"
 $AppVersion = "2025.1.0.126"
 $Installer = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
-$InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms /qn" # Optional
+$InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms" # Optional
+
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
@@ -72,7 +73,7 @@ switch ($Mode) {
             try {
                 # Run setup with custom arguments and create validation file
                 Write-LogEntry -Value "Starting $Mode of $AppName" -Severity 1
-                $Process = Start-Process $SetupFilePath -ArgumentList $InstallArguments -Wait -PassThru -ErrorAction Stop
+                $Process = Start-Process msiexec -ArgumentList "/i $Installer /quiet $InstallArguments" -Wait -PassThru -ErrorAction Stop
 
                 # Post Install Actions
                 if ($Process.ExitCode -eq "0") {
