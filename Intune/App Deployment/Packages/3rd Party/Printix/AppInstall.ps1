@@ -13,9 +13,9 @@
     powershell.exe -executionpolicy bypass -file .\appinstall.ps1 -Mode Uninstall
 
 .NOTES
-    - AUTHOR: 
+    - AUTHOR : 
     - Version: 
-    - Date: 
+    - Date   : 
 #>
 # Region Parameters
 [CmdletBinding()]
@@ -30,21 +30,21 @@ param(
 . "$PSScriptRoot\functions.ps1"
 
 # Application Variables
-$AppName = "Printix Client"
-$AppVersion = "2025.1.0.126"
-$Installer = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
+$AppName          = "Printix Client"
+$AppVersion       = "2025.1.0.126"
+$Installer        = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
 $InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms" # Optional
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
 
 # Template Variables
-$Date = Get-Date -Format "MM-dd-yyyy"
-$stagingFolderVar = $folderPaths.StagingFolder
-$logsFolderVar = $folderPaths.LogsFolder
-$LogFileName = "$($AppName)_${Mode}_$Date.log"
+$Date                = Get-Date -Format "MM-dd-yyyy"
+$stagingFolderVar    = $folderPaths.StagingFolder
+$logsFolderVar       = $folderPaths.LogsFolder
+$LogFileName         = "$($AppName)_${Mode}_$Date.log"
 $validationFolderVar = $folderPaths.ValidationFolder
-$AppValidationFile = "$validationFolderVar\$AppName.txt"
+$AppValidationFile   = "$validationFolderVar\$AppName.txt"
 
 # Begin Setup
 Write-LogEntry -Value "Initiating setup process" -Severity 1
@@ -58,20 +58,24 @@ switch ($Mode) {
     "Install" {
         try {
 
-            try {
-                # Uninstall legacy Printix Client
-                $uninstaller = "C:\Program Files\printix.net\Printix Client\unins000.exe"
-                $arguments = "/SILENT"
-                if (Test-Path $uninstaller) {
-                    Start-Process $uninstaller -ArgumentList $arguments -NoNewWindow -Wait
-                    Write-LogEntry -Value "Legacy Printix Client Uninstalled" -Severity 1
-                } else {
-                    Write-LogEntry -Value "Legacy Printix Client is not installed" -Severity 1
-                }
-            } catch {
-                Write-LogEntry -Value "Error uninstalling legacy Printix Client. Errormessage: $($_.Exception.Message)" -Severity 3
+            # Uninstall legacy Printix Client
+            $uninstaller = "C:\Program Files\printix.net\Printix Client\unins000.exe"
+            $arguments   = "/SILENT"
+
+            if (Test-Path $uninstaller) {
+                Start-Process $uninstaller -ArgumentList $arguments -NoNewWindow -Wait
+                Write-LogEntry -Value "Legacy Printix Client Uninstalled" -Severity 1
+            } else {
+                Write-LogEntry -Value "Legacy Printix Client is not installed" -Severity 1
             }
 
+            # Get all processes with "printix" in their name  
+            $processes = Get-Process | Where-Object { $_.Name -like '*printix*' }  
+  
+            # Kill each of these processes  
+            foreach ($process in $processes) {  
+                Stop-Process -Id $process.Id -Force  
+            }  
 
             # Copy files to staging folder
             Copy-Item -Path "$PSScriptRoot\Files\*" -Destination $SetupFolder -Recurse -Force -ErrorAction Stop
@@ -124,7 +128,7 @@ switch ($Mode) {
             if ($uninstallProcess.ExitCode -eq "0") {
                 # Delete validation file
                 try {
-                    Remove-Item -Path $AppValidationFile -Force -Confirm:$false
+                    Remove-Item -Path $AppValidationFile -Force -Confirm: $false
                     Write-LogEntry -Value "Validation file has been removed at $AppValidationFile" -Severity 1
 
                     # Cleanup 
@@ -133,11 +137,11 @@ switch ($Mode) {
                         Write-LogEntry -Value "Cleanup completed successfully" -Severity 1
 
                         # Remove left over driver install files
-                        $AppToUninstall = Get-InstalledApps -App $AppName | Select-Object -First 1
+                        $AppToUninstall    = Get-InstalledApps -App $AppName | Select-Object -First 1
                         $uninstall_command = 'MsiExec.exe'
-                        $Result = (($AppToUninstall.UninstallString -split ' ')[1]) + ' /SILENT'
-                        $uninstall_args = [string]$Result
-                        $uninstallProcess = Start-Process $uninstall_command -ArgumentList $uninstall_args -PassThru -Wait -ErrorAction Stop
+                        $Result            = (($AppToUninstall.UninstallString -split ' ')[1]) + ' /SILENT'
+                        $uninstall_args    = [string]$Result
+                        $uninstallProcess  = Start-Process $uninstall_command -ArgumentList $uninstall_args -PassThru -Wait -ErrorAction Stop
 
                     }
                 } catch [System.Exception] {
