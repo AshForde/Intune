@@ -30,10 +30,10 @@ param(
 . "$PSScriptRoot\functions.ps1"
 
 # Application Variables
-$AppName          = "Printix Client"
-$AppVersion       = "2025.1.0.126"
+$AppName          = "Printix Desktop Client"
+$AppVersion       = "2025"
 $Installer        = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
-$InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms" # Optional
+$InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7" # Optional
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
@@ -58,6 +58,16 @@ switch ($Mode) {
     "Install" {
         try {
 
+            # Get all processes with "printix" in their name  
+            $processes = Get-Process | Where-Object { $_.Name -like '*printix*' }  
+
+            # Kill each of these processes  
+            foreach ($process in $processes) {  
+                Stop-Process -Id $process.Id -Force  
+            }
+
+            Start-Sleep -Seconds 30
+
             # Uninstall legacy Printix Client
             $uninstaller = "C:\Program Files\printix.net\Printix Client\unins000.exe"
             $arguments   = "/SILENT"
@@ -68,14 +78,6 @@ switch ($Mode) {
             } else {
                 Write-LogEntry -Value "Legacy Printix Client is not installed" -Severity 1
             }
-
-            # Get all processes with "printix" in their name  
-            $processes = Get-Process | Where-Object { $_.Name -like '*printix*' }  
-
-            # Kill each of these processes  
-            foreach ($process in $processes) {  
-                Stop-Process -Id $process.Id -Force  
-            }  
 
             # Copy files to staging folder
             Copy-Item -Path "$PSScriptRoot\Files\*" -Destination $SetupFolder -Recurse -Force -ErrorAction Stop
