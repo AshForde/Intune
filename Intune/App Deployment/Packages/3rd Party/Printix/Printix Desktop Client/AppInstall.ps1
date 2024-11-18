@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    .NET Desktop Client 6.0
+    Printix
 
 .DESCRIPTION
-    Script to install .NET Desktop Client 6.0
+    Script to install Printix
 
 .PARAMETER Mode
     Sets the mode of operation. Supported modes are Install or Uninstall
@@ -13,9 +13,9 @@
     powershell.exe -executionpolicy bypass -file .\appinstall.ps1 -Mode Uninstall
 
 .NOTES
-    - AUTHOR: 
+    - AUTHOR : 
     - Version: 
-    - Date: 
+    - Date   : 
 #>
 # Region Parameters
 [CmdletBinding()]
@@ -30,22 +30,21 @@ param(
 . "$PSScriptRoot\functions.ps1"
 
 # Application Variables
-$AppName = "Microsoft Windows Desktop Runtime - 6.0.33"
-$AppVersion = "6.0"
-$Installer = "windowsdesktop-runtime-6.0.33-win-x64.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
-$InstallArguments = "/install /quiet /norestart" # Optional
-$UninstallArguments = "/uninstall /quiet /norestart" # Optional
+$AppName          = "Printix Client"
+$AppVersion       = "2025.1.0.126"
+$Installer        = "CLIENT_{hud.printix.net}_{13ef4486-2503-4ca9-86c4-1d7b5fae76d7}.MSI" # assumes the .exe or .msi installer is in the Files folder of the app package.
+$InstallArguments = "WRAPPED_ARGUMENTS=/id:13ef4486-2503-4ca9-86c4-1d7b5fae76d7:oms" # Optional
 
 # Initialize Directories
 $folderpaths = Initialize-Directories -HomeFolder C:\HUD\
 
 # Template Variables
-$Date = Get-Date -Format "MM-dd-yyyy"
-$stagingFolderVar = $folderPaths.StagingFolder
-$logsFolderVar = $folderPaths.LogsFolder
-$LogFileName = "$($AppName)_${Mode}_$Date.log"
+$Date                = Get-Date -Format "MM-dd-yyyy"
+$stagingFolderVar    = $folderPaths.StagingFolder
+$logsFolderVar       = $folderPaths.LogsFolder
+$LogFileName         = "$($AppName)_${Mode}_$Date.log"
 $validationFolderVar = $folderPaths.ValidationFolder
-$AppValidationFile = "$validationFolderVar\$AppName.txt"
+$AppValidationFile   = "$validationFolderVar\$AppName.txt"
 
 # Begin Setup
 Write-LogEntry -Value "Initiating setup process" -Severity 1
@@ -58,6 +57,26 @@ Write-LogEntry -Value "Setup folder has been created at: $Setupfolder." -Severit
 switch ($Mode) {
     "Install" {
         try {
+
+            # Uninstall legacy Printix Client
+            $uninstaller = "C:\Program Files\printix.net\Printix Client\unins000.exe"
+            $arguments   = "/SILENT"
+
+            if (Test-Path $uninstaller) {
+                Start-Process $uninstaller -ArgumentList $arguments -NoNewWindow -Wait
+                Write-LogEntry -Value "Legacy Printix Client Uninstalled" -Severity 1
+            } else {
+                Write-LogEntry -Value "Legacy Printix Client is not installed" -Severity 1
+            }
+
+            # Get all processes with "printix" in their name  
+            $processes = Get-Process | Where-Object { $_.Name -like '*printix*' }  
+
+            # Kill each of these processes  
+            foreach ($process in $processes) {  
+                Stop-Process -Id $process.Id -Force  
+            }  
+
             # Copy files to staging folder
             Copy-Item -Path "$PSScriptRoot\Files\*" -Destination $SetupFolder -Recurse -Force -ErrorAction Stop
             Write-LogEntry -Value "Setup files have been copied to $Setupfolder." -Severity 1
@@ -73,7 +92,7 @@ switch ($Mode) {
             try {
                 # Run setup with custom arguments and create validation file
                 Write-LogEntry -Value "Starting $Mode of $AppName" -Severity 1
-                $Process = Start-Process $SetupFilePath -ArgumentList $InstallArguments -Wait -PassThru -ErrorAction Stop
+                $Process = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$SetupFilePath`" /quiet $InstallArguments" -Wait -PassThru -ErrorAction Stop
 
                 # Post Install Actions
                 if ($Process.ExitCode -eq "0") {
@@ -89,7 +108,6 @@ switch ($Mode) {
                 if (Test-Path "$SetupFolder") {
                     Remove-Item -Path "$SetupFolder" -Recurse -Force -ErrorAction Continue
                     Write-LogEntry -Value "Cleanup completed successfully" -Severity 1
-                    exit
                 }
 
             } catch {
@@ -101,7 +119,7 @@ switch ($Mode) {
 
     "Uninstall" {
         try {
-            $AppToUninstall = Get-InstalledApps -App $AppName
+            $AppToUninstall = Get-InstalledApps -App $AppName | Select-Object -First 1
 
             # Uninstall App
             $uninstallProcess = Start-Process $AppToUninstall.UninstallString -ArgumentList $UninstallArguments -PassThru -Wait -ErrorAction stop
@@ -110,13 +128,21 @@ switch ($Mode) {
             if ($uninstallProcess.ExitCode -eq "0") {
                 # Delete validation file
                 try {
-                    Remove-Item -Path $AppValidationFile -Force -Confirm:$false
+                    Remove-Item -Path $AppValidationFile -Force -Confirm: $false
                     Write-LogEntry -Value "Validation file has been removed at $AppValidationFile" -Severity 1
 
                     # Cleanup 
                     if (Test-Path "$SetupFolder") {
                         Remove-Item -Path "$SetupFolder" -Recurse -Force -ErrorAction Continue
                         Write-LogEntry -Value "Cleanup completed successfully" -Severity 1
+
+                        # Remove left over driver install files
+                        $AppToUninstall    = Get-InstalledApps -App $AppName | Select-Object -First 1
+                        $uninstall_command = 'MsiExec.exe'
+                        $Result            = (($AppToUninstall.UninstallString -split ' ')[1]) + ' /SILENT'
+                        $uninstall_args    = [string]$Result
+                        $uninstallProcess  = Start-Process $uninstall_command -ArgumentList $uninstall_args -PassThru -Wait -ErrorAction Stop
+
                     }
                 } catch [System.Exception] {
                     Write-LogEntry -Value "Error deleting validation file. Errormessage: $($_.Exception.Message)" -Severity 3
