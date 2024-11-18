@@ -67,6 +67,10 @@ $ToActivate = @(
 
 $SelectedRoles = $ToActivate | Out-GridView -Title "Select Role(s) to Activate" -PassThru
 
+# Write the selected roles to the host as a comma-separated list
+Write-Host "Selected Roles:" -ForegroundColor Green
+Write-Host ($SelectedRoles -join ', ') -ForegroundColor Cyan
+
 # Provide justification to activate roles
 $Justification = Read-Host "Provide a justification"
 
