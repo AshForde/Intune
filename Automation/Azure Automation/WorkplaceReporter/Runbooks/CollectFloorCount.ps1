@@ -48,13 +48,16 @@ $datePeriod = "$($startTimeNzt.ToString('dd/MM/yyyy'))"
 
 Write-Output "Date being collected: $datePeriod"
 
-# Define the two IP addresses to filter by
+# Define the IP addresses to filter by
 $ipAddress1 = "203.167.143.72"
 $ipAddress2 = "203.167.143.80"
 $ipAddress3 = "203.97.18.66"
+$ipAddress4 = "203.97.25.26"
+$ipAddress5 = "203.167.151.106"
+$ipAddress6 = "203.97.3.186"
 
 # Update the filter query
-$filter = "createdDateTime ge " + $startTimeStr + " and createdDateTime lt " + $endTimeStr + " and (ipAddress eq '" + $ipAddress1 + "' or ipAddress eq '" + $ipAddress2 + "' or ipAddress eq '" + $ipAddress3 + "')" 
+$filter = "createdDateTime ge " + $startTimeStr + " and createdDateTime lt " + $endTimeStr + " and (ipAddress eq '" + $ipAddress1 + "' or ipAddress eq '" + $ipAddress2 + "' or ipAddress eq '" + $ipAddress3 + "' or ipAddress eq '" + $ipAddress4 + "' or ipAddress eq '" + $ipAddress5 + "' or ipAddress eq '" + $ipAddress6 + "')"
 
 # Get the audit log sign-ins with the filter
 $auditLogs = Get-MgAuditLogSignIn -All -Filter $filter
