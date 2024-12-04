@@ -147,7 +147,7 @@ function Get-InstalledApps {
         $SelectedApp += @($tempResult)
     }
 
-    return $SelectedApp
+    return $SelectedApp | select -First 1
 }
 # Function to get .NET version
 function Get-DotNetVersion {
