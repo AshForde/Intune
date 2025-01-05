@@ -30,8 +30,8 @@ param(
 . "$PSScriptRoot\functions.ps1"
 
 # Application Variables
-$AppName = "Microsoft Azure Storage Explorer version"
-$AppVersion = "1.34"
+$AppName = "Microsoft Azure Storage Explorer"
+$AppVersion = "1.36.2"
 $Installer = "StorageExplorer-windows-x64.exe" # assumes the .exe or .msi installer is in the Files folder of the app package.
 $InstallArguments = "/VERYSILENT /NORESTART /NOCANCEL /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /ALLUSERS" # Optional
 $UninstallArguments = "/VERYSILENT /NORESTART" # Optional
