@@ -57,6 +57,8 @@ $select = @(
     'SecurityIdentifier'
     'extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox'
     'extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox'
+    'extension_56a473fa1d5b476484f306f7b06ee688_ServiceAccount'
+
 ) -join ','
 
 # Graph API Call
@@ -130,6 +132,7 @@ do {
             'security_identifier'         = $user.SecurityIdentifier
             'room_mailbox'                = $User.extension_56a473fa1d5b476484f306f7b06ee688_RoomMailbox
             'shared_mailbox'              = $User.extension_56a473fa1d5b476484f306f7b06ee688_SharedMailbox
+            'Service_Account'             = $User.extension_56a473fa1d5b476484f306f7b06ee688_ServiceAccount
         }
     }
 } while ($uri)
